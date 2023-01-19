@@ -1,0 +1,7 @@
+type Runway {
+    name: String!
+    number: String!
+  }
+extend type Query {
+    runways: [Runway]
+  }
