@@ -11,8 +11,7 @@ import AircraftModel from "./models/Artifact";
 class ArtifactService {
   
     async findArtifacts() {
-      // Pagination login
-      console.log("running")
+      console.log("running");
       return AircraftModel.find().lean();
     }
   }
