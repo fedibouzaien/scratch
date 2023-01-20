@@ -2,6 +2,12 @@ import {
     getModelForClass,
     prop,
   } from '@typegoose/typegoose';
+  import { Field, ObjectType } from 'type-graphql';
+
+  // export interface AircraftAddInput {
+//   name: string;
+
+// }
 
   export class Aircraft {
     readonly _id: string;
@@ -17,6 +23,6 @@ import {
   
   }
   
-  const AircraftModel = getModelForClass(Aircraft)
+  const AircraftModel = getModelForClass<typeof Aircraft>(Aircraft) 
   export default AircraftModel;
   
