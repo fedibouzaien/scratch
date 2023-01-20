@@ -101,11 +101,11 @@ async function connectDB() {
     
 }
 
-const resolvers = {
-    Query: {
-      artifacts: () => Aircraft,
-    },
-  };
+// const resolvers = {
+//     Query: {
+//       artifacts: () => Aircraft,
+//     },
+//   };
 
 async function executeQueries(){
     const artifact = new Artifact ({

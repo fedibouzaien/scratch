@@ -1,0 +1,13 @@
+type Artifact  {
+    id:String!
+    title: String!
+    maxPass: number!
+    destination:String!
+  }
+  type Query {
+    artifacts: [Artifact!]!
+  }
+
+  type Query {
+    ping:String!
+  }
