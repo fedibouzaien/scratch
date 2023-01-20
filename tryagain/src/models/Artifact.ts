@@ -4,22 +4,26 @@ import {
   } from '@typegoose/typegoose';
 import { Field, ObjectType } from 'type-graphql';
 
+// export interface AircraftAddInput {
+//   name: string;
+
+// }
   @ObjectType()
   export class Aircraft {
     @Field()
-    readonly _id: string;
+    readonly _id!: string;
   
     @Field()
     @prop()
-    name: string;
+    name!: string;
   
     @Field()
     @prop()
-    maxPass: number;
+    maxPass!: number;
 
     @Field()
     @prop()
-    destination: string;
+    destination!: string;
   
   }
   

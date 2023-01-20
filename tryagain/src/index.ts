@@ -25,8 +25,10 @@ constructor(private artifactService: ArtifactService) {
   }
   @Query(returns => [Aircraft])
   async artifacts() {
+    const arti = await this.artifactService.findArtifacts();
+    
     // fake async in this example
-    return await this.artifactService.findArtifacts()
+    return arti ;
     // return this.artifactsCollection;
   }
 
@@ -84,7 +86,8 @@ async function bootstrap() {
 
 async function connectDB() {
     const db = await mongoose.connect("mongodb://localhost/typegoosedb") ;
-    console.log('database is connected to', db.connection.db.databaseName)
+    console.log('database is connected to', db.connection.db.databaseName);
+    
     
 }
 

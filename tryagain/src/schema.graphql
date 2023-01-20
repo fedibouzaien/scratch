@@ -1,0 +1,8 @@
+type Artifact {
+    title: String!
+    maxPass: number!
+    destination:String!
+  }
+ extend type Query {
+    artifacts: [Artifact!]!
+  }
