@@ -1,8 +1,13 @@
-type Artifact {
+type Artifact  {
+    id:String!
     title: String!
     maxPass: number!
     destination:String!
   }
- extend type Query {
+  type Query {
     artifacts: [Artifact!]!
+  }
+
+  type Query {
+    ping:String!
   }

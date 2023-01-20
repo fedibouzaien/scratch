@@ -11,22 +11,22 @@ import { Field, ObjectType } from 'type-graphql';
   @ObjectType()
   export class Aircraft {
     @Field()
-    readonly _id!: string;
+    readonly id!: string;
   
     @Field()
-    @prop()
+    @prop({ nullable: true })
     name!: string;
   
     @Field()
-    @prop()
+    @prop({ nullable: true })
     maxPass!: number;
 
     @Field()
-    @prop()
+    @prop({ nullable: true })
     destination!: string;
   
   }
-  
+
   const AircraftModel = getModelForClass<typeof Aircraft>(Aircraft) 
   export default AircraftModel;
   

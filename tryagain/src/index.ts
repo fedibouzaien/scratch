@@ -5,6 +5,8 @@ import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from '@apollo/server/standalone';
 import { types } from "@typegoose/typegoose";
 import AircraftModel from "./models/Artifact";
+import {TypegooseMiddleware} from './typegoose';
+import * as path from "path";
 
 
 
@@ -12,7 +14,7 @@ class ArtifactService {
   
     async findArtifacts() {
       console.log("running");
-      return AircraftModel.find().lean();
+      return AircraftModel.find();
     }
   }
 
@@ -22,17 +24,23 @@ class ArtifactResolver {
 constructor(private artifactService: ArtifactService) {
     this.artifactService = new ArtifactService();
   }
-  @Query(returns => [Aircraft])
-  async artifacts() {
+  @Query(() => [Aircraft])//
+  async artifacts() {//Promise<Aircraft> 
     const arti = await this.artifactService.findArtifacts();
-    
-    // fake async in this example
     return arti ;
     // return this.artifactsCollection;
   }
-
-  
 }
+
+@Resolver()
+class PingResolver {
+  @Query(() => String)//
+  async ping() {
+    return "pong" ;
+    // return this.artifactsCollection;
+  }
+}
+
 
 const typeDefs = `
   type Artifact {
@@ -41,6 +49,9 @@ const typeDefs = `
   }
   type Query {
     artifacts: [Artifact]
+  }
+  type Query {
+    ping: String
   }
 `;
 
@@ -52,7 +63,9 @@ async function bootstrap() {
   
       // build TypeGraphQL executable schema
       const schema = await buildSchema({
-        resolvers: [ArtifactResolver],
+        resolvers: [ArtifactResolver , PingResolver],
+        //globalMiddlewares: [TypegooseMiddleware],
+       // emitSchemaFile: path.resolve(__dirname, "./src/schema.gql"),
       });
   
       // Create GraphQL server
@@ -60,13 +73,11 @@ async function bootstrap() {
 
       
   
-      const server = new ApolloServer({
-        typeDefs,
-        resolvers,
+      const server = new ApolloServer({schema
       });
 
       
-
+      
       console.log(` Server initialise`);
       // Start the server
       const { url } = await startStandaloneServer(server, {
