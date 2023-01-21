@@ -1,7 +1,8 @@
+
 type Artifact  {
     id:String!
     title: String!
-    maxPass: number!
+    maxPass: String!
     destination:String!
   }
   type Query {

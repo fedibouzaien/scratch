@@ -12,9 +12,11 @@ const main = async () => {
     ]
   })
 
+  // const { schema, executor } = await gateway.load();
+
+
   const server = new ApolloServer({
-    gateway,
-    plugins: [ApolloServerPluginLandingPageGraphQLPlayground()]
+    gateway
   });
 
   const { url } = await server.listen({ port: 6969 })

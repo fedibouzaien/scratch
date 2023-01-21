@@ -1,8 +1,9 @@
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import mongoose from "mongoose"
-import { Query, Resolver, buildSchema } from "type-graphql";
+import { Arg,Mutation,Query, Resolver, buildSchema } from "type-graphql";
 import RunwayModel ,{Runway, } from "./models/Runway"
+import { ObjectId } from "mongodb";
 
 
 // A schema is a collection of type definitions (hence "typeDefs")
@@ -26,6 +27,29 @@ class RunwayService {
     console.log("running");
     return RunwayModel.find();
   }
+
+  async findRunwaybyid(id:ObjectId) {
+    console.log("running");
+
+    return RunwayModel.find(id);
+  }
+
+  async runwayDelete(p: String) {
+    const findPost = await RunwayModel.findById(p);
+    console.log(findPost);
+    const r = await RunwayModel.findByIdAndDelete(p);
+    console.log(r);
+    // const deletePost = await AircraftModel.findOneAndUpdate(
+    //     {id: p},
+    //     {$set: {deleteFlag: true, }},
+    //     {new: true}
+    // ).then(function(){
+    //     console.log(" deleted"); 
+    //  }).catch(function(error){
+    //     console.log(error); 
+    //  });
+    return findPost;
+}
 }
 
 @Resolver()
@@ -33,11 +57,31 @@ class RunwayResolver {
 constructor(private runwayService: RunwayService) {
   this.runwayService = new RunwayService();
 }
+
+@Mutation(() => Runway)//
+  async deleteRunway(
+    @Arg("id") id: String
+  ) {
+    const arti = await this.runwayService.runwayDelete(id);
+    console.log("arti",arti)
+    return arti ;
+    // return this.artifactsCollection;
+  }
+
 @Query(() => [Runway])
 async runways() {
   const arti = await this.runwayService.findRunways();
   return arti ;
 }
+@Query(() => Runway)//
+  async findRunway(
+    @Arg("id", type => String) id: ObjectId
+  ) {
+    const arti = await this.runwayService.findRunwaybyid(id);
+    console.log(arti)
+    return arti ;
+    // return this.artifactsCollection;
+  }
 }
 
 // const runways = [
