@@ -2,6 +2,7 @@ import {
     getModelForClass,
     prop,
   } from '@typegoose/typegoose';
+import { Types } from 'mongoose';
 import { Directive, Field, InputType, ObjectType } from 'type-graphql';
 
 // export interface AircraftAddInput {
@@ -12,19 +13,19 @@ import { Directive, Field, InputType, ObjectType } from 'type-graphql';
 @InputType()
 export class UpdateAircraft {
     @Field()
-    id: string;
+    id: String;
 
     @Field()
     @prop()
-    name!: string;
+    name: string;
   
-    @Field()
+    @Field({ nullable: true })
     @prop({ nullable: true })
-    maxPass!: String;
+    maxPass: String;
 
-    @Field()
+    @Field({ nullable: true })
     @prop({ nullable: true })
-    destination!: string;
+    destination: string;
 }
 
 @InputType()
@@ -35,11 +36,11 @@ export class DeleteAircraft {
 
 
 
-  @Directive('@key(fields: "id")')
+@Directive(`@key(fields: "id")`)
   @ObjectType()
   export class Aircraft {
-    @Field()
-    readonly id!: string;
+    @Field(() => String)
+    readonly id!: Types.ObjectId;
   
     @Field()
     @prop({ nullable: true })

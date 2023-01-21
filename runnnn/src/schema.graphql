@@ -6,8 +6,10 @@ type Artifact  {
   }
   type Query {
     artifacts: [Artifact!]!
-  }
-
-  type Query {
     ping:String!
   }
+
+  type Mutation {
+    deleteRunway:Artifact
+  }
+  

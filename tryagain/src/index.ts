@@ -9,6 +9,8 @@ import {TypegooseMiddleware} from './typegoose';
 import * as path from "path";
 import gql from "graphql-tag";
 import { ObjectId } from "mongodb";
+import { buildSubgraphSchema } from "@apollo/subgraph";
+import * as fs from 'fs';
 
 
 
@@ -22,26 +24,24 @@ class ArtifactService {
     async findArtifactbyid(id:ObjectId) {
         console.log("running");
 
-        return AircraftModel.find(id);
+        return AircraftModel.findById(id);
       }
 
       async artifactCreate(arr:aircraftCreate) {
-        const crAr = AircraftModel.create(arr)
+        const crAr = (await AircraftModel.create(arr)).save
         console.log(crAr)
         return crAr;
       }
 
       async artifacUpdate(post: UpdateAircraft) {
-        const findAircraft = await AircraftModel.findById(post.id);
-        console.log(findAircraft)
-        const updateAircraft = await AircraftModel.findOneAndUpdate(
+        // const mid = new mongoose.Types.ObjectId(post.id);
+        // const findAircraft = await AircraftModel.findOne(mid);
+        // console.log(findAircraft)
+        const updateAircraft = await AircraftModel.findByIdAndUpdate(
             {id: post.id},
             {$set: {
-              name: post.name, 
-              maxPass: post.maxPass,
-              destination:post.destination
+              ...post
             }},
-            {new: true}
         );
         console.log(updateAircraft)
         return updateAircraft;
@@ -54,8 +54,7 @@ class ArtifactService {
         console.log(r);
         // const deletePost = await AircraftModel.findOneAndUpdate(
         //     {id: p},
-        //     {$set: {deleteFlag: true, }},
-        //     {new: true}
+        //    
         // ).then(function(){
         //     console.log(" deleted"); 
         //  }).catch(function(error){
@@ -69,7 +68,7 @@ class ArtifactService {
   // @InputType()
   // class ArtifactInput extends Aircraft {}
 
-@Resolver()
+@Resolver(()=>Aircraft)
 class ArtifactResolver {
 //   private artifactsCollection: typeof Artifact[] = [];
 constructor(private artifactService: ArtifactService) {
@@ -83,13 +82,18 @@ constructor(private artifactService: ArtifactService) {
   }
 
   @Mutation(() => Aircraft)
-    async artifacUpdate(@Arg("post") post: UpdateAircraft) {
-        return this.artifactService.artifacUpdate(post);
+    async artifacUpdate(@Arg("post") post: UpdateAircraft)  {
+       const ar =await this.artifactService.artifacUpdate(post);
+       console.log(ar)
+      return ar
     }
 
   @Mutation(() => Aircraft)
   async aircraftCreate(@Arg("arr") arr: aircraftCreate) {
-        return this.artifactService.artifactCreate(arr);
+
+    const t = this.artifactService.artifactCreate(arr);
+    console.log(t)
+        return t
     }
 
     @Mutation(() => Aircraft)//
@@ -111,12 +115,6 @@ constructor(private artifactService: ArtifactService) {
     // return this.artifactsCollection;
   }
 
-  // @Mutation(() => [Aircraft])//
-  // async addArtifacts(@Arg("option", () => ArtifactInput) option: ArtifactInput,) {
-  //   const arti = await this.artifactService.addArtifacts();
-  //   return arti ;
-  //   // return this.artifactsCollection;
-  // }
 
   // @Mutation(()=> Artifact)
   // async addArtifact(@Arg('ids', () => String) ids: string,) {
@@ -137,18 +135,7 @@ class PingResolver {
 }
 
 
-const typeDefs = `
-  type Artifact {
-    title: String
-    author: String
-  }
-  type Query {
-    artifacts: [Artifact]
-  }
-  type Query {
-    ping: String
-  }
-`;
+
 
 async function bootstrap() {
     try {
@@ -165,37 +152,62 @@ async function bootstrap() {
   
       // Create GraphQL server
     //   const server = new ApolloServer({ schema });
-    // const { readFileSync } = require('fs');
+    
 
 
-    // const typeDefs = gql`
-    //  extend schema @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@shareable"])
+    const typeDefs = gql`
+     extend schema @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@shareable"])
 
         
-    //     type Artifact  @key(fields: "id"){
-    //     id:String!
-    //     title: String!
-    //     maxPass: String!
-    //     destination:String!
-    //   }
-    //   type Query {
-    //     artifacts: [Artifact!]!
-    //   }
-    // `
-    // const resolvers = {
-    //     User: {
-    //         __resolveReference: (reference) => {
-    //             return AircraftModel.find();
-    //         }
-    //     }
-    // }
+        
+        type Artifact  @key(fields: "id"){
+        id:String!
+        title: String!
+        maxPass: String!
+        destination:String!
+        runway:Runway!
+      }
+
+          type Runway @key(fields: "id", resolvable: false) {
+            id: String!
+            }
+
+      type Query {
+    artifacts: [Artifact!]!
+    findartifact:Artifact
+    ping:String!
+  }
+  type Mutation{
+    deleteArtifact:Artifact
+
+  }
+    `
+    const resolvers = {
+        Query:{
+          artifacts: () => [Artifact]
+        },
+        Artifact: {
+            __resolveReference: (reference) => {
+                return AircraftModel.find();
+            }
+        }
+    }
     //  const { buildSubgraphSchema } = require('@apollo/subgraph');
 
     //   const server = new ApolloServer({schema : buildSubgraphSchema({ typeDefs, ArtifactResolver }) 
     //   });
 
-      const schema = await buildSchema({
-        resolvers: [ArtifactResolver , PingResolver],
+    // const typeDefs = fs.readFile(path.join(__dirname, './schema.graphql'), 'utf8', (error, data) => {
+    //   console.log("schema",data)
+    // })
+
+
+    // let artiData : Aircraft[];
+    // artiData= AircraftModel.find().toO ;
+
+    
+      const schema = await buildSubgraphSchema({
+        typeDefs,resolvers 
       })
       
       const server = new ApolloServer({schema
@@ -209,7 +221,8 @@ async function bootstrap() {
       
       console.log(`🚀  Server ready at: ${url}`);
       
-      
+      // const ar = AircraftModel.;
+    // console.log(ar)
     } catch (err) {
       console.error(err);
     }
@@ -218,7 +231,7 @@ async function bootstrap() {
   bootstrap();
 
 async function connectDB() {
-    const db = await mongoose.connect("mongodb://localhost/typegoosedb") ;
+    const db = await mongoose.connect("mongodb://localhost/aircraftDB") ;
     console.log('database is connected to', db.connection.db.databaseName);
     
     

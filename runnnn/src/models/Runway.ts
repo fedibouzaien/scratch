@@ -27,5 +27,5 @@ export class Runway {
 
 }
 
-const RunwayModel = getModelForClass<typeof Runway>(Runway) 
+const RunwayModel = getModelForClass(Runway) //<typeof Runway>
 export default RunwayModel;

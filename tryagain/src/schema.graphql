@@ -1,5 +1,8 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.0",
+        import: ["@key"])
 
-type Artifact  {
+type Artifact @key(fields: "id") {
     id:String!
     title: String!
     maxPass: String!
@@ -7,8 +10,6 @@ type Artifact  {
   }
   type Query {
     artifacts: [Artifact!]!
-  }
-
-  type Query {
+    findartifact:Artifact
     ping:String!
   }

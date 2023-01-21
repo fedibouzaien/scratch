@@ -9,17 +9,6 @@ import { ObjectId } from "mongodb";
 // A schema is a collection of type definitions (hence "typeDefs")
 // that together define the "shape" of queries that are executed against
 // your data.
-const typeDefs = `
-  type Runway {
-    id:String
-    name: String
-    number: String
-    destination:String
-  }
-  type Query {
-    runways: [Runway]
-  }
-`;
 
 class RunwayService {
   
@@ -99,6 +88,24 @@ async runways() {
   //       runways: () => runways,
   //   },
   // };
+  import gql from "graphql-tag";
+
+  const typeDefs = gql`
+extend schema @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@shareable"])
+
+            
+            type Runway @key(fields: "id"){
+            id: String!
+            name:String!
+            number:String!
+            destination:String!
+            }
+
+            type Query {
+              runways: [Runway!]!
+              findRunway:Runway!
+  }
+  `;
 
   async function bootstrap(){
 
